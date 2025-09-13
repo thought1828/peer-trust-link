@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VerificationBadge } from "@/components/ui/verification-badge";
 import { CredibilityMeter } from "@/components/ui/credibility-meter";
-import { PlusCircle, Search, Clock, DollarSign, User, Star, MessageCircle } from "lucide-react";
+import { PlusCircle, Search, Star, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Task {
@@ -39,6 +38,7 @@ export default function StudentDashboard() {
   const [user, setUser] = useState<any>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [activeTab, setActiveTab] = useState("overview");
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const { toast } = useToast();
 
@@ -49,8 +49,6 @@ export default function StudentDashboard() {
       return;
     }
     setUser(userData);
-
-    // Load mock data
     loadMockTasks();
     loadMockMentors();
   }, []);
@@ -113,7 +111,6 @@ export default function StudentDashboard() {
 
   const handleCreateTask = () => {
     setIsCreatingTask(true);
-    // Mock task creation
     setTimeout(() => {
       toast({
         title: "Task Created!",
@@ -132,280 +129,275 @@ export default function StudentDashboard() {
     }
   };
 
+  const navigation = [
+    { id: "overview", label: "Overview" },
+    { id: "tasks", label: "My Tasks" },
+    { id: "mentors", label: "Find Mentors" },
+    { id: "create", label: "Post Task" }
+  ];
+
   if (!user) return null;
 
   return (
     <Layout userType="student">
-      <div className="container py-8 px-4 space-y-8">
-        {/* Welcome Section */}
-        <div className="flex flex-col md:flex-row items-start justify-between gap-6">
-          <div>
-            <h1 className="text-3xl font-bold">Welcome back, {user.name}!</h1>
-            <p className="text-muted-foreground mt-2">
-              Find the perfect mentor for your next project
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <CredibilityMeter score={user.credibilityScore} size="sm" />
-            <VerificationBadge type="student" />
+      <div className="flex h-screen bg-background">
+        {/* Sidebar */}
+        <div className="w-64 border-r bg-muted/30 p-6">
+          <div className="space-y-6">
+            {/* User Profile */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <img
+                  src={user.avatar_url || "/placeholder.svg"}
+                  alt={user.name}
+                  className="h-10 w-10 rounded-full"
+                />
+                <div>
+                  <p className="font-medium">{user.name.split(' ')[0]}</p>
+                  <VerificationBadge type="student" size="sm" />
+                </div>
+              </div>
+              <CredibilityMeter score={user.credibilityScore} size="sm" showLabel={false} />
+            </div>
+
+            {/* Navigation */}
+            <nav className="space-y-1">
+              {navigation.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                    activeTab === item.id
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-accent text-muted-foreground"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+
+            {/* Quick Stats */}
+            <div className="space-y-3 pt-6 border-t">
+              <div className="text-sm">
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Active Tasks</span>
+                  <span className="font-medium">2</span>
+                </div>
+              </div>
+              <div className="text-sm">
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Total Spent</span>
+                  <span className="font-medium">₹1,300</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="tasks">My Tasks</TabsTrigger>
-            <TabsTrigger value="mentors">Find Mentors</TabsTrigger>
-            <TabsTrigger value="create">Post Task</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="dashboard" className="space-y-6">
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-campus-blue-light rounded-lg">
-                      <Clock className="h-5 w-5 text-campus-blue" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold">2</p>
-                      <p className="text-sm text-muted-foreground">Active Tasks</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-campus-green-light rounded-lg">
-                      <DollarSign className="h-5 w-5 text-campus-green" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold">₹1,300</p>
-                      <p className="text-sm text-muted-foreground">Total Spent</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-verification-gold/20 rounded-lg">
-                      <Star className="h-5 w-5 text-verification-gold" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold">4.8</p>
-                      <p className="text-sm text-muted-foreground">Avg Rating</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Recent Tasks */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Tasks</CardTitle>
-                <CardDescription>Your latest task requests</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {tasks.slice(0, 3).map((task) => (
-                    <div key={task.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="space-y-1">
-                        <h4 className="font-medium">{task.title}</h4>
-                        <p className="text-sm text-muted-foreground">{task.description}</p>
-                        <div className="flex items-center gap-2">
-                          <Badge className={getStatusColor(task.status)}>
-                            {task.status.replace('_', ' ')}
-                          </Badge>
-                          <span className="text-sm text-muted-foreground">
-                            {task.applications} applications
-                          </span>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold">₹{task.budget}</p>
-                        <p className="text-sm text-muted-foreground">Budget</p>
-                      </div>
-                    </div>
-                  ))}
+        {/* Main Content */}
+        <div className="flex-1 overflow-auto">
+          <div className="p-8">
+            {activeTab === "overview" && (
+              <div className="space-y-8">
+                <div>
+                  <h1 className="text-2xl font-semibold mb-2">Good morning, {user.name.split(' ')[0]}!</h1>
+                  <p className="text-muted-foreground">Here's what's happening with your tasks today.</p>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
 
-          <TabsContent value="tasks" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">My Tasks</h2>
-              <Button variant="hero" className="gap-2">
-                <PlusCircle className="h-4 w-4" />
-                New Task
-              </Button>
-            </div>
-            
-            <div className="grid gap-4">
-              {tasks.map((task) => (
-                <Card key={task.id}>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-3 flex-1">
-                        <div className="flex items-center gap-3">
-                          <h3 className="font-semibold text-lg">{task.title}</h3>
-                          <Badge className={getStatusColor(task.status)}>
-                            {task.status.replace('_', ' ')}
-                          </Badge>
+                {/* Recent Tasks */}
+                <div className="space-y-4">
+                  <h2 className="text-lg font-medium">Recent Tasks</h2>
+                  <div className="space-y-3">
+                    {tasks.map((task) => (
+                      <div key={task.id} className="flex items-center justify-between p-4 border rounded-lg bg-card">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium">{task.title}</h3>
+                            <Badge className={getStatusColor(task.status)}>
+                              {task.status.replace('_', ' ')}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{task.applications} applications</p>
                         </div>
-                        <p className="text-muted-foreground">{task.description}</p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span>Deadline: {new Date(task.deadline).toLocaleDateString()}</span>
-                          <span>{task.applications} applications received</span>
-                          <Badge variant="outline">{task.category}</Badge>
+                        <div className="text-right">
+                          <p className="font-semibold">₹{task.budget}</p>
+                          <p className="text-sm text-muted-foreground">Budget</p>
                         </div>
                       </div>
-                      <div className="text-right space-y-2">
-                        <p className="text-xl font-bold text-campus-green">₹{task.budget}</p>
-                        <Button variant="outline" size="sm">View Details</Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="mentors" className="space-y-6">
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Search mentors by skills..." className="pl-10" />
+                    ))}
+                  </div>
                 </div>
               </div>
-              <Button variant="outline">Filters</Button>
-            </div>
+            )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {mentors.map((mentor) => (
-                <Card key={mentor.id} className="hover:shadow-medium transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <img
-                        src={mentor.avatar}
-                        alt={mentor.name}
-                        className="h-16 w-16 rounded-full"
-                      />
-                      <div className="flex-1 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-semibold flex items-center gap-2">
-                              {mentor.name}
-                              {mentor.isVerified && <VerificationBadge type="mentor" size="sm" />}
-                            </h3>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Star className="h-4 w-4 text-verification-gold fill-current" />
-                              <span className="text-sm font-medium">{mentor.rating}</span>
-                              <span className="text-sm text-muted-foreground">
-                                ({mentor.completedTasks} tasks)
-                              </span>
+            {activeTab === "tasks" && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h1 className="text-2xl font-semibold">My Tasks</h1>
+                  <Button variant="default" onClick={() => setActiveTab("create")}>
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    New Task
+                  </Button>
+                </div>
+                
+                <div className="space-y-4">
+                  {tasks.map((task) => (
+                    <Card key={task.id}>
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-2 flex-1">
+                            <div className="flex items-center gap-3">
+                              <h3 className="font-semibold">{task.title}</h3>
+                              <Badge className={getStatusColor(task.status)}>
+                                {task.status.replace('_', ' ')}
+                              </Badge>
+                            </div>
+                            <p className="text-muted-foreground text-sm">{task.description}</p>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              <span>Due {new Date(task.deadline).toLocaleDateString()}</span>
+                              <span>{task.applications} applications</span>
+                              <Badge variant="outline">{task.category}</Badge>
                             </div>
                           </div>
-                          <Badge variant={mentor.tier === "Expert" ? "default" : "secondary"}>
-                            {mentor.tier}
-                          </Badge>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="flex flex-wrap gap-1">
-                            {mentor.skills.map((skill) => (
-                              <Badge key={skill} variant="outline" className="text-xs">
-                                {skill}
-                              </Badge>
-                            ))}
+                          <div className="text-right space-y-2">
+                            <p className="text-lg font-semibold text-campus-green">₹{task.budget}</p>
+                            <Button variant="outline" size="sm">View</Button>
                           </div>
-                          <CredibilityMeter score={mentor.credibilityScore} size="sm" />
                         </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
 
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold text-campus-green">
-                            ₹{mentor.hourlyRate}/hr
-                          </span>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm">
-                              <MessageCircle className="h-4 w-4" />
-                            </Button>
-                            <Button variant="campus" size="sm">
-                              Hire
-                            </Button>
+            {activeTab === "mentors" && (
+              <div className="space-y-6">
+                <div>
+                  <h1 className="text-2xl font-semibold mb-4">Find Mentors</h1>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input placeholder="Search mentors by skills..." className="pl-10" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {mentors.map((mentor) => (
+                    <Card key={mentor.id} className="hover:shadow-md transition-shadow">
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                          <img
+                            src={mentor.avatar}
+                            alt={mentor.name}
+                            className="h-12 w-12 rounded-full"
+                          />
+                          <div className="flex-1 space-y-3">
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-semibold">{mentor.name}</h3>
+                                {mentor.isVerified && <VerificationBadge type="mentor" size="sm" />}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1">
+                                  <Star className="h-4 w-4 text-verification-gold fill-current" />
+                                  <span className="text-sm font-medium">{mentor.rating}</span>
+                                </div>
+                                <span className="text-sm text-muted-foreground">
+                                  ({mentor.completedTasks} tasks)
+                                </span>
+                              </div>
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-1">
+                              {mentor.skills.slice(0, 3).map((skill) => (
+                                <Badge key={skill} variant="outline" className="text-xs">
+                                  {skill}
+                                </Badge>
+                              ))}
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-campus-green">
+                                ₹{mentor.hourlyRate}/hr
+                              </span>
+                              <div className="flex gap-2">
+                                <Button variant="outline" size="sm">
+                                  <MessageCircle className="h-4 w-4" />
+                                </Button>
+                                <Button variant="campus" size="sm">
+                                  Hire
+                                </Button>
+                              </div>
+                            </div>
                           </div>
                         </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === "create" && (
+              <div className="space-y-6">
+                <div>
+                  <h1 className="text-2xl font-semibold mb-2">Post a New Task</h1>
+                  <p className="text-muted-foreground">Describe your task and get help from verified mentors</p>
+                </div>
+                
+                <Card className="max-w-2xl">
+                  <CardContent className="p-6 space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Task Title</label>
+                      <Input placeholder="e.g., Debug React Component Issue" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Description</label>
+                      <Textarea 
+                        placeholder="Provide detailed description of what you need help with..."
+                        rows={4}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Budget (₹)</label>
+                        <Input type="number" placeholder="500" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Deadline</label>
+                        <Input type="date" />
                       </div>
                     </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Category</label>
+                      <Input placeholder="e.g., Programming, Design, Mathematics" />
+                    </div>
+
+                    <Button 
+                      onClick={handleCreateTask}
+                      disabled={isCreatingTask}
+                      className="w-full"
+                      variant="hero"
+                    >
+                      {isCreatingTask ? (
+                        <div className="flex items-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          Creating Task...
+                        </div>
+                      ) : (
+                        "Post Task"
+                      )}
+                    </Button>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="create" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Post a New Task</CardTitle>
-                <CardDescription>
-                  Describe your task and get help from verified mentors
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Task Title</label>
-                  <Input placeholder="e.g., Debug React Component Issue" />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Description</label>
-                  <Textarea 
-                    placeholder="Provide detailed description of what you need help with..."
-                    rows={4}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Budget (₹)</label>
-                    <Input type="number" placeholder="500" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Deadline</label>
-                    <Input type="date" />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Category</label>
-                  <Input placeholder="e.g., Programming, Design, Mathematics" />
-                </div>
-
-                <Button 
-                  onClick={handleCreateTask}
-                  disabled={isCreatingTask}
-                  className="w-full"
-                  variant="hero"
-                  size="lg"
-                >
-                  {isCreatingTask ? (
-                    <div className="flex items-center gap-2">
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                      Creating Task...
-                    </div>
-                  ) : (
-                    "Post Task"
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </Layout>
   );

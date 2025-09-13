@@ -19,61 +19,28 @@ export function Layout({ children, userType }: LayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary">
-                <Users className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                CampusMate
-              </span>
+        <div className="container flex h-14 items-center justify-between px-6">
+          <div className="flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-primary">
+              <Users className="h-4 w-4 text-white" />
             </div>
-            
-            {user && (
-              <nav className="hidden md:flex items-center gap-6">
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  Tasks
-                </Button>
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <Users className="h-4 w-4" />
-                  Mentors
-                </Button>
-                {userType === "admin" && (
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <Shield className="h-4 w-4" />
-                    Admin
-                  </Button>
-                )}
-              </nav>
-            )}
+            <span className="text-lg font-bold bg-gradient-primary bg-clip-text text-transparent">
+              CampusMate
+            </span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {user ? (
               <>
                 <Button variant="ghost" size="sm">
-                  <Search className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm">
                   <Bell className="h-4 w-4" />
                 </Button>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={user.avatar_url || "/placeholder.svg"}
-                      alt={user.name}
-                      className="h-8 w-8 rounded-full"
-                    />
-                    <div className="hidden sm:block">
-                      <p className="text-sm font-medium">{user.name}</p>
-                      <div className="flex items-center gap-1">
-                        {user.userType === "student" && <VerificationBadge type="student" size="sm" />}
-                        {user.userType === "mentor" && <VerificationBadge type="mentor" size="sm" />}
-                      </div>
-                    </div>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <img
+                    src={user.avatar_url || "/placeholder.svg"}
+                    alt={user.name}
+                    className="h-7 w-7 rounded-full"
+                  />
                   <Button variant="outline" size="sm" onClick={handleLogout}>
                     Logout
                   </Button>
@@ -89,9 +56,6 @@ export function Layout({ children, userType }: LayoutProps) {
                 </Button>
               </div>
             )}
-            <Button variant="ghost" size="sm" className="md:hidden">
-              <Menu className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </header>
@@ -100,18 +64,13 @@ export function Layout({ children, userType }: LayoutProps) {
         {children}
       </main>
 
-      <footer className="border-t bg-muted/30">
-        <div className="container py-8 px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <div className="flex h-6 w-6 items-center justify-center rounded bg-gradient-primary">
-                <Users className="h-4 w-4 text-white" />
-              </div>
-              <span className="font-semibold">CampusMate</span>
+      <footer className="border-t bg-muted/20">
+        <div className="container py-6 px-6">
+          <div className="flex items-center justify-center gap-2">
+            <div className="flex h-5 w-5 items-center justify-center rounded bg-gradient-primary">
+              <Users className="h-3 w-3 text-white" />
             </div>
-            <p className="text-sm text-muted-foreground">
-              Connecting students with verified mentors across campus
-            </p>
+            <span className="text-sm font-medium">CampusMate</span>
           </div>
         </div>
       </footer>
